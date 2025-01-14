@@ -34,4 +34,7 @@ class Category:
         self.description = description
         self.products = products
         Category.category_count +=1
-        self.product_count = len(products)
+
+    def get_product_count(self) -> int:
+        """Метод, который возвращает количество продуктов в категории"""
+        return len(self.products)
