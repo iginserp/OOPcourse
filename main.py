@@ -1,28 +1,4 @@
-class Product:
-    """Класс для представления продукта."""
-    name: str
-    description: str
-    price: float
-    quantity: int
-    def __init__(self, name, description, price, quantity):
-        """Метод для инициализации экземпляра класса. Задаем значения атрибутам экземпляра класса"""
-        self.name = name
-        self.description = description
-        self.price = price
-        self.quantity = quantity
-
-
-class Category:
-    """Класс для представления категории."""
-    name: str
-    description: str
-    products: list
-
-    def __init__(self, name, description, products):
-        """Метод для инициализации экземпляра класса. Задаем значения атрибутам экземпляра класса"""
-        self.name = name
-        self.description = description
-        self.products = products
+from src.classes import Product, Category
 
 if __name__ == "__main__":
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
