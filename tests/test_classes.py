@@ -104,4 +104,3 @@ def test_new_product_duplicate_update() -> None:
     assert product2.price == 120.0
     assert product2.quantity == 15
     assert product1 is product2
-
