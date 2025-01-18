@@ -25,12 +25,13 @@ class Category:
     # Переменная на уровне класса для подсчета количества продуктов данной категории
     product_count = 0
 
-    def __init__(self, name, description, products):
+    def __init__(self, name: str, description: str, products: list = None) -> None:
         """Метод для инициализации экземпляра класса. Задаем значения атрибутам экземпляра класса"""
         self.name = name
         self.description = description
         self.products = products
         Category.category_count += 1
+        Category.product_count += len(self.products)
 
     def get_product_count(self) -> int:
         """Метод, который возвращает количество продуктов в категории"""
