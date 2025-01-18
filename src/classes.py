@@ -11,7 +11,7 @@ class Product:
         self.description = description
         self.price = price
         self.quantity = quantity
-        Product.product_count += 1
+
 
 
 class Category:
