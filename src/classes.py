@@ -55,7 +55,7 @@ class Product:
 
 
 
-class Category(BaseItem):
+class Category:
     """Категории продуктов"""
 
     # name: str  # Название
