@@ -5,34 +5,133 @@ class Product:
     price: float
     quantity: int
 
-    def __init__(self, name, description, price, quantity):
-        """Метод для инициализации экземпляра класса. Задаем значения атрибутам экземпляра класса"""
+    def __init__(self, name: str, description: str, price: float = 0, quantity: int = 0) -> None:
+        if price < 0:
+            raise ValueError("Цена не должна быть отрицательной")
+        if quantity < 0:
+            raise ValueError("Количество не должно быть отрицательным")
+        if quantity == 0:
+            raise ZeroQuantityError()
+
         self.name = name
         self.description = description
-        self.price = price
+        self.__price = price
         self.quantity = quantity
+        super().__init__()
+
+    def __str__(self) -> str:
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
+    @property
+    def price(self) -> float:
+        """
+        Геттер для приватного атрибута цены.
+        """
+        return self.__price
+
+    @price.setter
+    def price(self, new_price: float) -> None:
+        """
+        Сеттер для приватного атрибута цены.
+
+        Реализует проверку:
+          в случае если цена равна или ниже нуля, выводите сообщение в консоль
+          “Цена не должна быть нулевая или отрицательная”, при этом новую цену устанавливать не нужно.
+          В случае если цена товара понижается, добавить логику подтверждения пользователем вручную через ввод
+          y (значит yes) или n (значит no) для согласия понизить цену или для отмены действия соответственно.
+        """
+        if new_price <= 0:
+            print("Цена не должна быть нулевая или отрицательная")
+            return
+        if new_price < self.__price:
+            confirmation = input(f"Вы уверены, что хотите понизить цену с {self.__price} до {new_price}? (y/n): ")
+            if confirmation.lower() == "y":
+                self.__price = new_price
+                print(f"Цена успешно понижена до {new_price}")
+            else:
+                print("Понижение цены отменено.")
+        else:
+            self.__price = new_price
 
 
 
 class Category:
-    """Класс для представления категории."""
-    name: str
-    description: str
-    products: list
+    """Категории продуктов"""
 
-    # Переменная на уровне класса для подсчета количества категорий
-    category_count = 0
-    # Переменная на уровне класса для подсчета количества продуктов данной категории
-    product_count = 0
+    # name: str  # Название
+    # description: str  # Описание
+    __products: list  # Список товаров категории
 
-    def __init__(self, name: str, description: str, products: list = None) -> None:
-        """Метод для инициализации экземпляра класса. Задаем значения атрибутам экземпляра класса"""
-        self.name = name
-        self.description = description
-        self.products = products
-        Category.category_count += 1
-        Category.product_count += len(self.products)
+    _category_count = 0
+
+    def __init__(self, name: str, description: str, __products: list) -> None:
+
+        # self.name = name
+        # self.description = description
+        super().__init__(name, description)
+        self.__products = __products
+
+        Category._category_count += 1
+
+    @property
+    def products(self) -> list:
+        """
+        Возвращает список товаров в виде строк в формате:
+        "Название продукта, 80 руб. Остаток: 15 шт."
+        """
+        formatted_list = []
+        for product in self.__products:
+            formatted_list.append(f"{str(product)}")
+        return formatted_list
+
+    def __str__(self) -> str:
+        total_quantity = sum(product.quantity for product in self.__products)
+        return f"{self.name}, количество продуктов: {total_quantity} шт."
+
+    def add_product(self, product: Product) -> None:
+        """
+         Добавляет продукт в категорию
+        :param product: объект продукта
+        """
+        # if isinstance(product, Product):
+        #     return self.__products.append(product)
+        # raise TypeError
+        try:
+            if isinstance(product, Product):
+                if product.quantity == 0:
+                    raise ZeroQuantityError()
+                self.__products.append(product)
+                print(f"Товар {product.name} добавлен в категорию {self.name}.")
+            else:
+                raise TypeError("Неверный тип товара для добавления.")
+        except ZeroQuantityError as e:
+            print(f"Ошибка добавления товара в категорию {self.name}: {e}")
+            raise
+        except TypeError as e:
+            print(f"Ошибка добавления товара в категорию {self.name}: {e}")
+            raise
+        finally:
+            print(f"Обработка добавления товара в категорию {self.name} завершена.")
 
     def get_product_count(self) -> int:
-        """Метод, который возвращает количество продуктов в категории"""
-        return len(self.products)
+        """
+        Возвращает количество продуктов в категории
+        """
+        return len(self.__products)
+
+    def get_average_price(self) -> float:
+        """
+        Подсчитывает средний ценник всех товаров в категории.
+
+        Обрабатывает случай, когда в категории нет товаров
+        или сумма цен всех товаров равна нулю.
+        В таком случае возвращает 0.
+        """
+        if not self.__products:
+            return 0
+        try:
+            total_price = sum(product.price for product in self.__products)
+            return float(total_price / len(self.__products))
+        except ZeroDivisionError:
+            return 0
+
