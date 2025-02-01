@@ -1,7 +1,10 @@
-import pytest
 from unittest.mock import patch
-from src.classes import Category, Product
+
+import pytest
 from pytest import CaptureFixture
+
+from src.products import Category, Product
+
 
 def test_init_products(products_samsung: Product) -> None:
     assert products_samsung.name == "Samsung Galaxy S23 Ultra"

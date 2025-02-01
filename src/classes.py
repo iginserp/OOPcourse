@@ -1,14 +1,18 @@
+from typing import Any, Dict, List, Optional, Type
+
 from src.base_item import BaseItem
 from src.base_product import BaseProduct
+from src.exceptions import ZeroQuantityError
 from src.print_mixin import PrintMixin
 
 
 class Product(BaseProduct, PrintMixin):
-    """Класс для представления продукта."""
-    name: str
-    description: str
-    price: float
-    quantity: int
+    """Класс продукты"""
+
+    name: str  # Название
+    description: str  # Описание
+    __price: float  # Цена
+    quantity: int  # Количество в наличии
 
     def __init__(self, name: str, description: str, price: float = 0, quantity: int = 0) -> None:
         if price < 0:
@@ -58,9 +62,38 @@ class Product(BaseProduct, PrintMixin):
         else:
             self.__price = new_price
 
+    @classmethod
+    def new_product(
+        cls: Type["Product"], product_data: Dict[str, Any], existing_products: Optional[List["Product"]] = None
+    ) -> "Product":
+        """
+        Создает объект Product из словаря, обрабатывая дубликаты и выбирая более высокую цену.
+
+        :param product_data: Словарь с данными о продукте (name, description, price, quantity)
+        :param existing_products: Список существующих продуктов, в котором нужно искать дубликаты
+        :return: Созданный или обновленный объект Product
+        """
+        name = product_data.get("name") or ""
+        description = product_data.get("description") or ""
+        price = product_data.get("price", 0.0)
+        quantity = product_data.get("quantity", 0)
+
+        if existing_products:
+            for product in existing_products:
+                if product.name == name:
+                    # Товар с таким именем уже существует, обновляем его
+                    product.quantity += quantity
+                    product.price = max(product.price, price)  # type: ignore
+                    return product
+        # Товар не существует, создаем новый
+        return cls(name, description, price, quantity)
+
+    def __add__(self, other) -> float:  # type: ignore
+        """Магический метод для сложения продуктов и возврата полной стоимости."""
+        return (self.price * self.quantity) + (other.price * other.quantity)  # type: ignore
 
 
-class Category:
+class Category(BaseItem):
     """Категории продуктов"""
 
     # name: str  # Название
@@ -139,4 +172,3 @@ class Category:
             return float(total_price / len(self.__products))
         except ZeroDivisionError:
             return 0
-
