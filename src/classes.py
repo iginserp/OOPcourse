@@ -1,4 +1,9 @@
-class Product:
+from src.base_item import BaseItem
+from src.base_product import BaseProduct
+from src.print_mixin import PrintMixin
+
+
+class Product(BaseProduct, PrintMixin):
     """Класс для представления продукта."""
     name: str
     description: str
